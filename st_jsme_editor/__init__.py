@@ -41,4 +41,5 @@ def jsme_editor(smiles: str, key=None, height: int = 400):
         # El valor por defecto debe ser el SMILES inicial o una cadena vacía
         default=smiles or ""
     )
+
     return component_value
