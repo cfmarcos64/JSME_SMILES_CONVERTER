@@ -1,51 +1,44 @@
+# -*- coding: utf-8 -*-
 import streamlit.components.v1 as components
 import os
 
-# Determina la ruta absoluta del directorio donde se encuentra este archivo.
-_ROOT = os.path.dirname(os.path.abspath(__file__))
+# Determina si estamos en modo de desarrollo local o en modo de producción (release)
+# Cambia a True para Streamlit Cloud
+_RELEASE = False 
 
-# Concatena con 'frontend' para encontrar la carpeta que contiene el index.html.
+# Configuración de rutas
+_ROOT = os.path.dirname(os.path.abspath(__file__))
 _FRONTEND_DIR = os.path.join(_ROOT, "frontend")
 
-# Nombre interno del componente
-_COMPONENT_NAME = "jsme_editor"
-
-# Define el modo de ejecución (True para cargar desde archivos locales, False para URL de desarrollo)
-_RELEASE = True 
-
-if _RELEASE:
-    # En modo release, Streamlit carga los archivos desde el directorio especificado.
-    _jsme_component = components.declare_component(
-        _COMPONENT_NAME, 
-        path=_FRONTEND_DIR
+if not _RELEASE:
+    # MODO DESARROLLO: Carga el componente desde el servidor de desarrollo (Vite)
+    # AJUSTADO AL PUERTO 5173
+    _component_func = components.declare_component(
+        "jsme_editor",
+        url="http://localhost:5173", 
     )
 else:
-    # Este es el modo de desarrollo (normalmente localhost:3001 si usas npm start).
-    _jsme_component = components.declare_component(
-        _COMPONENT_NAME,
-        url="http://localhost:5173"
-    )
+    # MODO PRODUCCIÓN: Carga los assets estáticos compilados en el subdirectorio 'frontend'
+    _component_func = components.declare_component("jsme_editor", path=_FRONTEND_DIR)
 
 
-def jsme_editor(smiles: str = "", height: int = 400, key=None) -> str:
+def jsme_editor(smiles: str, key=None, height: int = 400):
     """
-    Muestra el editor JSME de dibujo de estructuras químicas.
-    
-    :param smiles: El SMILES inicial (canónico) de la molécula a cargar.
-    :param height: La altura del editor JSME en píxeles.
-    :param key: Clave única para el componente Streamlit.
-    :return: El SMILES no canónico de la estructura actualmente dibujada, 
-             actualizado en tiempo real por el usuario.
+    Muestra el editor JSME y devuelve el SMILES no canónico de la estructura.
+
+    Args:
+        smiles (str): El SMILES canónico inicial que se cargará en el editor.
+        key (str, optional): La clave única del componente para Streamlit. Defaults to None.
+        height (int, optional): Altura del editor en píxeles. Defaults to 400.
+
+    Returns:
+        str: El SMILES JSME no canónico de la estructura actual.
     """
-    
-    # Llama a la función del componente de Streamlit, pasando los argumentos (props)
-    # al frontend de JavaScript. El valor de retorno es lo que JS nos devuelve.
-    component_value = _jsme_component(
+    component_value = _component_func(
         smiles=smiles, 
         height=height, 
         key=key, 
-        # El valor por defecto se usa para la inicialización del estado del componente
-        default=smiles 
+        # El valor por defecto debe ser el SMILES inicial o una cadena vacía
+        default=smiles or ""
     )
-
     return component_value
