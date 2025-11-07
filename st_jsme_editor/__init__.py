@@ -4,7 +4,7 @@ import os
 
 # Determina si estamos en modo de desarrollo local o en modo de producción (release)
 # Cambia a True para Streamlit Cloud
-_RELEASE = False 
+_RELEASE = True 
 
 # Configuración de rutas
 _ROOT = os.path.dirname(os.path.abspath(__file__))
