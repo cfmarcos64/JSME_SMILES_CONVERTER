@@ -1,0 +1,9 @@
+Python
+
+pycache/
+*.pyc
+.ipynb_checkpoints/
+
+Node/Frontend
+
+st_jsme_editor/frontend/node_modules/
